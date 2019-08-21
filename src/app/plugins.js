@@ -1,5 +1,5 @@
 /*
- ~  Copyright 2016 Ripple Foundation C.I.C. Ltd
+ ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
  ~  
  ~  Licensed under the Apache License, Version 2.0 (the "License");
  ~  you may not use this file except in compliance with the License.
@@ -13,55 +13,21 @@
  ~  See the License for the specific language governing permissions and
  ~  limitations under the License.
  */
-import clinicalnotes from './rippleui/pages/clinical-notes/index';
-import allergies from './rippleui/pages/allergies/index';
-import eolcareplans from './rippleui/pages/care-plans/index';
-import contacts from './rippleui/pages/contacts/index';
-import diagnoses from './rippleui/pages/diagnoses/index';
-import dicom from './rippleui/pages/dicom/index';
-import documents from './rippleui/pages/documents/index';
-import genericmdt from './rippleui/pages/generic-mdt/index';
-import heightAndWeight from './rippleui/pages/height-and-weight/index';
-import medication from './rippleui/pages/medications/index';
-import orders from './rippleui/pages/orders/index';
-import personalnotes from './rippleui/pages/personal-notes/index';
-import procedures from './rippleui/pages/procedures/index';
-import referrals from './rippleui/pages/referrals/index';
-import results from './rippleui/pages/results/index';
-import transferOfCare from './rippleui/pages/transfer-of-care/index';
-import vaccinations from './rippleui/pages/vaccinations/index';
-import vitals from './rippleui/pages/vitals/index';
-import clinicalstatements from './rippleui/pages/clinical-statements/index';
-import events from './rippleui/pages/events/index';
-import drawings from './rippleui/pages/drawings/index';
 
-export default [
-  diagnoses,
-  medication,
-  allergies,
-  contacts,
-  
-  events,
-  documents,
-  
-  orders,
-  results,
-  procedures,
-  
-  clinicalnotes,
-  clinicalstatements,
-  personalnotes,
+import corePlugins from './pulsetileui/pages/_plugins_/Core-Plugins/index';
+// import silverPlugins from './pulsetileui/pages/_plugins_/Silver-Plugins/index';
+// import bronzePlugins from './pulsetileui/pages/_plugins_/Bronze-Plugins/index';
 
-  vaccinations,
-  vitals,
+function transferPlugins (from, to) {
+  from.forEach((item) => {
+    to.push(item);
+  });
+}
 
-  dicom,
-  drawings,
-  
-  referrals,
-  genericmdt,
-  transferOfCare,
-  
-  eolcareplans,
-  heightAndWeight
-]
+const plugins = [];
+
+transferPlugins(corePlugins, plugins);
+// transferPlugins(silverPlugins, plugins);
+// transferPlugins(bronzePlugins, plugins);
+
+export default plugins;

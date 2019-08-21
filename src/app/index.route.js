@@ -1,5 +1,5 @@
 /*
-  ~  Copyright 2016 Ripple Foundation C.I.C. Ltd
+  ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
   ~  
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ function routeConfig($stateProvider, $urlRouterProvider) {
         views: {
           main: {template: '<patients-component><patients-component>'}
         },
-        params: { patientsList: [], advancedSearchParams: [], displayEmptyTable: false },
+        params: { patientsList: [], advancedSearchParams: [], displayEmptyTable: false, searchString: null, searchDescription: null },
 				breadcrumbs: [{
           title: 'Home',
           state: 'patients-charts'
@@ -115,7 +115,14 @@ function routeConfig($stateProvider, $urlRouterProvider) {
         url: '/search-report?searchString',
         views: {
           main: {template: '<report-chart-component><report-chart-component>'}
-        }
+        },
+        breadcrumbs: [{
+          title: 'Home',
+          state: 'patients-charts'
+        }, {
+          title: 'Search Report',
+          state: 'search-report'
+        }]
       })
       .state('patients-list-full', {
         url: '/patients-full-details?ageFrom&ageTo&orderType&pageNumber&reportType&searchString&queryType',

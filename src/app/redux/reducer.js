@@ -1,5 +1,5 @@
 /*
-  ~  Copyright 2016 Ripple Foundation C.I.C. Ltd
+  ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
   ~  
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -15,32 +15,31 @@
 */
 import { combineReducers } from 'redux';
 
-import patients from '../rippleui/pages/patients-list/patients-reducer-all';
-import patientsGet from '../rippleui/pages/patients-list/patients-reducer-get';
-import search from '../rippleui/search/search-reducer-all';
-import chart from '../rippleui/search/chart-reducer-get';
-import studies from '../rippleui/pages/dicom/studies-reducer-all';
-import series from '../rippleui/pages/dicom/series-reducer-all';
-import instanceGet from '../rippleui/pages/dicom/instance-reducer-get';
-import instanceIdGet from '../rippleui/pages/dicom/instance-id-reducer-get';
-import findReferral from '../rippleui/pages/documents/documents-reducer-find-referral';
+import pagesInfo from './pages/pages-reducer';
+import errorOfRequest from '../pulsetileui/handle-errors/handle-errors-reducer';
+import patients from '../pulsetileui/pages/patients-list/patients-reducer-all';
+import patientsGet from '../pulsetileui/pages/patients-list/patients-reducer-get';
+import search from '../pulsetileui/search/search-reducer-all';
+import chart from '../pulsetileui/search/chart-reducer-get';
 
 import plugins from '../plugins';
 
 let reducers = {
+  pagesInfo,
+  errorOfRequest,
   patients,
   patientsGet,
   search,
   chart,
-  studies,
-  series,
-  instanceGet,
-  instanceIdGet,
-  findReferral
 };
 
-plugins.forEach((plugin)=>{
+plugins.forEach((plugin) => {
   reducers[plugin.name] = plugin.reducer;
+
+  // if plugin has more than one reducer
+  if (plugin.reducers) {
+    Object.assign(reducers, plugin.reducers)
+  }
 });
 
 export default combineReducers(reducers);

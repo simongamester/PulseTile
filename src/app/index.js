@@ -1,5 +1,5 @@
 /*
-  ~  Copyright 2016 Ripple Foundation C.I.C. Ltd
+  ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
   ~  
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import 'angular-sanitize';
 import 'chart.js';
 import 'bootstrap/dist/js/bootstrap';
 import 'bootstrap-editable';
-import 'malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar'
+import 'malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar';
 import 'angular-spinner';
 import 'jquery-timepicker-jt';
 import 'angular-jquery-timepicker';
@@ -39,6 +39,7 @@ import 'angular-swiper';
 import 'swiper';
 import 'angular-drag-and-drop-lists';
 import 'fabric.js';
+import 'angular-bootstrap-datetimepicker';
 
 //commons
 import reducer from './redux/reducer';
@@ -48,161 +49,186 @@ import Patient from './helpers/patient';
 import deviceDetector from './helpers/deviceDetector';
 import './helpers/polyfills';
 
-//components 
-import UiKitComponent from './rippleui/pages/ui-kit/ui-kit.component';
-import ProfileComponent from './rippleui/pages/profile/profile.component';
-import HeaderComponent from './rippleui/header-bar/header.component.js';
-import PatientsChartsComponent from './rippleui/pages/patients-charts/patients-charts.component';
-import PatientsSummaryComponent from './rippleui/pages/patient-summary/patients-summary.component';
-import PatientsListFullComponent from './rippleui/pages/patients-list-full/patients-list-full.component';
-import PatientsSidebarComponent from './rippleui/pages/patients-detail/patients-sidebar.component';
-import PatientsBannerComponent from './rippleui/pages/patients-detail/patients-banner.component';
-import SearchComponent from './rippleui/search/search.component';
-import SearchAdvancedComponent from './rippleui/search/search-advanced.component';
-import ReportChartComponent from './rippleui/search/report-chart.component';
-import MainComponent from './rippleui/main-component/main.component';
-import HomeSidebarComponent from './rippleui/pages/patients-lookup/home-sidebar.component';
+//components
+import InitialiseComponent from './pulsetileui/initialise/initialise.component';
+import MainComponent from './pulsetileui/main-component/main.component';
+import HomeSidebarComponent from './pulsetileui/pages/patients-lookup/home-sidebar.component';
+import UiKitComponent from './pulsetileui/pages/ui-kit/ui-kit.component';
+import ProfileComponent from './pulsetileui/pages/profile/profile.component';
+import HeaderComponent from './pulsetileui/header-bar/header.component';
+import HandleErrorsComponent from './pulsetileui/handle-errors/handle-errors.component';
+import PatientsChartsComponent from './pulsetileui/pages/patients-charts/patients-charts.component';
+import PatientsSummaryComponent from './pulsetileui/pages/patient-summary/patients-summary.component';
+import PatientsListFullComponent from './pulsetileui/pages/patients-list-full/patients-list-full.component';
+import PatientsSidebarComponent from './pulsetileui/pages/patients-detail/patients-sidebar.component';
+import PatientsBannerComponent from './pulsetileui/pages/patients-detail/patients-banner.component';
+import SearchComponent from './pulsetileui/search/search.component';
+import SearchAdvancedComponent from './pulsetileui/search/search-advanced.component';
+import ReportChartComponent from './pulsetileui/search/report-chart.component';
+
 import ServiceRequests from './services/serviceRequests.js';
 import ServiceStateManager from './services/serviceStateManager.js';
-import ServiceVitalsSigns from './rippleui/pages/vitals/serviceVitalsSigns.js';
-import ServiceActions from './rippleui/pages/dicom/serviceActions.js';
 import ServiceFormatted from './services/serviceFormatted.js';
-import TemplateService from './services/TemplateService.js';
+import ServiceDateTimePicker from './services/serviceDateTimePicker.js';
 import ServiceThemes from './services/serviceThemes.js';
-import ServiceTransferOfCare from './rippleui/pages/transfer-of-care/serviceTransferOfCare.js';
-import ServicePatients from './rippleui/pages/patients-list/servicePatients.js';
+import ServicePatients from './pulsetileui/pages/patients-list/servicePatients.js';
 
-import ScheduleModal from './rippleui/pages/events/schedule-modal';
-import ConfirmationModal from './rippleui/confirmation/confirmation';
-import ConfirmationDocsModal from './rippleui/confirmation/confirmation-documents';
+import ConfirmationModal from './pulsetileui/confirmation/confirmation';
+import ConfirmationRedirectModal from './pulsetileui/confirmation/confirmation-redirect';
+import ConfirmationDocsModal from './pulsetileui/confirmation/confirmation-documents';
+import ConfirmationHandleErrors from './pulsetileui/handle-errors/handle-errors-confirmation';
 
 import routeConfig from 'app/index.route';
 import 'app/scss/core.scss';
 
 import 'app/directives/index.js';
 import 'app/filters/index.js';
-import 'app/rippleui/pages/patients-list/index.js';
+import 'app/pulsetileui/pages/patients-list/index.js';
 
 import plugins from './plugins';
 
+const appModules = [
+  uiRouter,
+  ngAnimate,
+  uiBootstrap,
+  ngRedux,
+  actions,
+  dirPagination,
+  'ripple-ui.patients',
+  'ripple-ui.directives',
+  'ripple-ui.filters',
+  'angularSpinner',
+  'ui.calendar',
+  'ui.timepicker',
+  'ui.bootstrap.datetimepicker',
+  'angular-loading-bar',
+  'xeditable',
+  'ngScrollbars',
+  'rzModule',
+  'ui.select',
+  'ksSwiper',
+  'ngSanitize',
+  'dndLists'
+];
+
+  // Add Modules to App from Plugins
+  plugins.forEach(plugin => {
+    if (plugin.modules) {
+      plugin.modules.forEach(item => {
+        appModules.push(item);
+      })
+    }
+  });
+
 let app = angular
-    .module('ripple-ui', [
-        uiRouter,
-        ngAnimate,
-        uiBootstrap,
-        ngRedux,
-        actions,
-        dirPagination,
-        'ripple-ui.patients',
-        'ripple-ui.directives',
-        'ripple-ui.filters',
-        'angularSpinner',
-        'ui.calendar',
-        'ui.timepicker',
-        'angular-loading-bar',
-        'xeditable',
-        'ngScrollbars',
-        'rzModule',
-        'ui.select',
-        'ksSwiper',
-        'ngSanitize',
-        'dndLists'
-    ])
-    .factory('ScheduleModal', ScheduleModal)
-    .factory('ConfirmationModal', ConfirmationModal)
-    .factory('ConfirmationDocsModal', ConfirmationDocsModal)
+  .module('ripple-ui', appModules)
+  .factory('ConfirmationModal', ConfirmationModal)
+  .factory('ConfirmationRedirectModal', ConfirmationRedirectModal)
+  .factory('ConfirmationDocsModal', ConfirmationDocsModal)
+  .factory('ConfirmationHandleErrors', ConfirmationHandleErrors)
 
-    
-    .factory('httpMiddleware', httpMiddleware)
-    .factory('Patient', Patient)
-    .factory('deviceDetector', deviceDetector)
+  .factory('httpMiddleware', httpMiddleware)
+  .factory('Patient', Patient)
+  .factory('deviceDetector', deviceDetector)
 
-    .service('templateService', TemplateService)
-    .service('serviceThemes', ServiceThemes)
-    .service('serviceTransferOfCare', ServiceTransferOfCare)
-    .service('servicePatients', ServicePatients)
-    .service('serviceFormatted', ServiceFormatted)
-    .service('serviceRequests', ServiceRequests)
-    .service('serviceStateManager', ServiceStateManager)
-    .service('serviceVitalsSigns', ServiceVitalsSigns)
-    .service('serviceActions', ServiceActions);
+  .service('serviceThemes', ServiceThemes)
+  .service('servicePatients', ServicePatients)
+  .service('serviceFormatted', ServiceFormatted)
+  .service('serviceRequests', ServiceRequests)
+  .service('serviceStateManager', ServiceStateManager)
+  .service('serviceDateTimePicker', ServiceDateTimePicker);
 
-  plugins.forEach((plugin)=>{
-    Object.keys(plugin.components).forEach((name)=>{
+
+  plugins.forEach(plugin => {
+    // Add Factories to App from Plugins
+    if (plugin.factories) {
+      Object.keys(plugin.factories).forEach(name => {
+        app = app.factory(name, plugin.factories[name]);
+      })
+    }
+
+    // Add Services to App from Plugins
+    if (plugin.services) {
+      Object.keys(plugin.services).forEach(name => {
+        app = app.service(name, plugin.services[name]);
+      })
+    }
+
+    // Add Components to App from Plugins
+    Object.keys(plugin.components).forEach(name => {
       app = app.component(name, plugin.components[name]);
     })
   });
 
   app
+    .component('initialiseComponent', InitialiseComponent)
+    .component('mainComponent', MainComponent)
+    .component('homeSidebarComponent', HomeSidebarComponent)
     .component('uiKitComponent', UiKitComponent)
     .component('profileComponent', ProfileComponent)
-    .component('headerComponent', HeaderComponent)
+		.component('headerComponent', HeaderComponent)
+		.component('handleErrorsComponent', HandleErrorsComponent)
     .component('patientsChartsComponent', PatientsChartsComponent)
     .component('patientsSummaryComponent', PatientsSummaryComponent)
     .component('patientsSidebarComponent', PatientsSidebarComponent)
     .component('patientsBannerComponent', PatientsBannerComponent)   
-    .component('patientsListFullComponent', PatientsListFullComponent)    
-    .component('mainComponent', MainComponent)
-    .component('homeSidebarComponent', HomeSidebarComponent)
+    .component('patientsListFullComponent', PatientsListFullComponent)
     .component('searchComponent', SearchComponent)
     .component('searchAdvancedComponent', SearchAdvancedComponent)
     .component('reportChartComponent', ReportChartComponent)
     
     .config(routeConfig)
-    .config(function (paginationTemplateProvider) {
-        paginationTemplateProvider.setString(require('./rippleui/pagination/dirPagination.tpl.html'));
-    })
+    .config(['paginationTemplateProvider',
+      function (paginationTemplateProvider) {
+        paginationTemplateProvider.setString(require('./pulsetileui/pagination/dirPagination.tpl.html'));
+      }
+    ])
     .config(['$ngReduxProvider', $ngReduxProvider => {
-        const middleware = ['httpMiddleware'];
+      const middleware = ['httpMiddleware'];
 
-        if (process.env.NODE_ENV === 'development') {
-            middleware.push(createLogger({
-                level: 'info',
-                collapsed: true
-            }));
-        }
+      if (process.env.NODE_ENV === 'development') {
+        middleware.push(createLogger({
+          level: 'info',
+          collapsed: true
+        }));
+      }
 
-        $ngReduxProvider.createStoreWith(reducer, middleware);
+      $ngReduxProvider.createStoreWith(reducer, middleware);
     }])
     .config(['cfpLoadingBarProvider', cfpLoadingBarProvider => {
-        cfpLoadingBarProvider.includeSpinner = false;
+      cfpLoadingBarProvider.includeSpinner = false;
     }])
-    .config(function (ScrollBarsProvider) {
+    .config(['ScrollBarsProvider',
+      function (ScrollBarsProvider) {
         // the following settings are defined for all scrollbars unless the
         // scrollbar has local scope configuration
         ScrollBarsProvider.defaults = {
-            scrollButtons: {
-                scrollAmount: 'auto', // scroll amount when button pressed
-                enable: false // enable scrolling buttons by default
-            },
-            scrollInertia: 0, // adjust however you want
-            axis: 'y',
-            theme: 'dark-custom',
-            autoHideScrollbar: false,
-            mouseWheel:{ preventDefault: false }
+          scrollButtons: {
+            scrollAmount: 'auto', // scroll amount when button pressed
+            enable: false // enable scrolling buttons by default
+          },
+          scrollInertia: 0, // adjust however you want
+          axis: 'y',
+          theme: 'dark-custom',
+          autoHideScrollbar: false,
+          mouseWheel:{ preventDefault: false }
         };
-    })
-    .config(function(uiSelectConfig) {
+      }
+    ])
+    .config(['uiSelectConfig',
+      function(uiSelectConfig) {
         uiSelectConfig.theme = 'bootstrap';
         uiSelectConfig.resetSearchInput = false;
         uiSelectConfig.appendToBody = true;
         uiSelectConfig.searchEnabled = false;
-    });
-    app.run(function(editableOptions, editableThemes) {
-      editableOptions.theme = 'bs3'; // bootstrap3 theme
-      editableThemes.bs3.inputClass = 'input-sm';
-      editableThemes.bs3.buttonsClass = 'btn-sm';
-    });
-    app.controller('mainCtrl', function ($scope, $timeout) {
-        // $timeout(function() {
-        //     $scope.updateScrollbar('scrollTo', 100, {
-        //     scrollInertia: 0
-        //   });
-        // });
-        // $scope.myScrollTo = function () {
-        //   $scope.updateScrollbar('scrollTo', 1000, {
-        //     scrollInertia: 0
-        //   });
-        // };
-    });
-console.log('app start');
+      }
+    ]);
+    app.run(['editableOptions', 'editableThemes',
+      function(editableOptions, editableThemes) {
+        editableOptions.theme = 'bs3'; // bootstrap3 theme
+        editableThemes.bs3.inputClass = 'input-sm';
+        editableThemes.bs3.buttonsClass = 'btn-sm';
+      }
+    ]);
+
+// console.log('app start');

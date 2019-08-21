@@ -1,5 +1,5 @@
 /*
- ~  Copyright 2016 Ripple Foundation C.I.C. Ltd
+ ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
  ~  
  ~  Licensed under the Apache License, Version 2.0 (the "License");
  ~  you may not use this file except in compliance with the License.
@@ -20,11 +20,31 @@ class ServiceFormatted {
   constructor () {
     this.formatCollection = {
       DDMMMYYYY: 'DD-MMM-YYYY',
+      YYYYMMDD: 'YYYY-MM-DD',
       DDMMMMYYYY: 'DD MMMM YYYY',
-      HHmm: 'HH:mm'
+      HHmm: 'HH:mm',
+      DDMMMYYYYHHmm: 'DD-MMM-YYYY  HH:mm'
     };
     this.filteringKeys = [];
     this.filteringKeys2 = [];
+
+    /* istanbul ignore next */
+    this.modificate = function (collection, options) {
+      if (collection && options) {
+        collection.map((item, index) => {
+          options.forEach((option) => {
+            if (option.key) {
+              option.keyFrom = option.key;
+              option.keyTo = option.key;
+            }
+            item[option.keyTo] = option.fn(item[option.keyFrom], index);
+          });
+
+          return item;
+        });
+      }
+      return collection;
+    };
 
     /* istanbul ignore next  */
     this.formattingDate = function(date, format) {
@@ -39,7 +59,7 @@ class ServiceFormatted {
         }
       }
 
-      return;
+      return '';
     };
 
     /* istanbul ignore next  */
@@ -51,6 +71,16 @@ class ServiceFormatted {
       }
       return collection;
     };
+
+    /* istanbul ignore next */
+    this.getDateSeconds = function (date) {
+      return new Date(date).getTime();
+    };
+
+    /* istanbul ignore next */
+    this.getDateMainFormat = function (date) {
+      return this.formattingDate(date, this.formatCollection.DDMMMYYYY);
+    }.bind(this);
 
     /* istanbul ignore next  */
     this.formattedSearching = function(row, query) {
@@ -69,6 +99,8 @@ class ServiceFormatted {
       
       return farmatedStr;
     };
+
+    /* istanbul ignore next */
     this.formattedSearching2 = function(row, query) {
       var str = '';
       var farmatedStr;
@@ -80,11 +112,22 @@ class ServiceFormatted {
         if (this.filteringKeys2.indexOf(key) !== -1) {
           str += ' ' + row[key].toLowerCase();
         }
-        query = query.replace('&nbsp;', ' ');
+        query = query.replace(/&nbsp;/g, ' ').trim();
         farmatedStr = str.indexOf(query.toLowerCase() || '') !== -1;
       });
 
       return farmatedStr;
+    };
+
+    /* istanbul ignore next */
+    this.propsToString = function(obj, ...ignoreKeys) {
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key) &&
+            ignoreKeys.indexOf(key) === -1 &&
+            _.isNumber(obj[key])) {
+          obj[key] = obj[key].toString();
+        }
+      }
     };
       
   };

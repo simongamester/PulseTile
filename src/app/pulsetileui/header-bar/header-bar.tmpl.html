@@ -1,0 +1,138 @@
+<!--
+  ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
+  ~  
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~  
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+<header class="header">
+  <nav class="navbar">
+    <a ng-click="$ctrl.goBack()" class="btn-header btn-header-prev" ng-if="isShowPreviousBtn"><i class="fa fa-arrow-left"></i></a>
+    <div class="wrap-logo">
+      <div class="logo" >
+        <div class="logo-icon">
+          <a ng-click="$ctrl.goLogo()">
+            <img src="{{logoB64}}" class="img" alt="logo">
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <ul class="user-panel" role="tablist">
+      <li class="user-panel-item visible-xs" ng-class="{active: searchShow}"><a class="btn-header" ng-click="searchShow = !searchShow">
+        <i class="fa fa-search"></i></a>
+      </li>
+      <li class="user-panel-item" uib-dropdown>
+        <a class="btn-header btn-notification" uib-dropdown-toggle>
+          <i class="fa fa-bell-o"></i>
+          <span class="count">2</span>
+        </a>
+        <div class="notifications-drop dropdown-menu-right" id="tab-notifications" uib-dropdown-menu>
+          <div class="notifications-header">Notifications (2)</div>
+          <div class="notifications-body">
+            <ul class="notifications-list">
+              <li class="notifications-list-item">
+                <div class="notification-info">Information from Liquid Logic (Social Care) is currently unavailable.</div>
+                <div class="notification-time"><em>10 minutes ago</em></div>
+              </li>
+              <li class="notifications-list-item">
+                <div class="notification-info">Information from Liquid Logic (Social Care) is currently unavailable.</div>
+                <div class="notification-time"><em>15 minutes ago</em></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </li>
+      <li class="user-panel-item" uib-dropdown>
+        <a class="btn-header btn-user" uib-dropdown-toggle>
+          <i class="fa fa-user"></i>
+        </a>
+        <div class="dropdown-user dropdown-menu-right" uib-dropdown-menu>
+          <div class="user-profile-image" ng-click="$ctrl.goProfile()">
+            <div class="img">
+              <img src="../../assets/images/user.jpg" alt="">
+            </div>
+          </div>
+          <div class="user-profile-info">
+						<div class="user-profile-info__item name"  ng-click="$ctrl.goProfile()">{{user.given_name}} {{user.family_name}}</div>
+
+						<div class="user-profile-info__descr">
+							<div class="user-profile-info__item role" ng-if="user.role">{{user.role}}</div>
+							<div class="user-profile-info__item email">{{user.email}}</div>
+							<div class="user-profile-info__item birthday">10/05/2099</div>
+						</div>
+						<div class="specification">
+							<div class="user-profile-info__title registered">Registered GP</div>
+							<div class="user-profile-info__item version-back">About Showcase Stack; PulseTile version {{versionOfPulseTile}}/QEWD_Ripple version {{versionOfServer}}</div>
+							<div class="user-profile-info__item version-front">Angular version {{versionOfAngular}}</div>
+						</div>
+            <a class="btn btn-success btn-block btn-signout" ng-click="$ctrl.signout()"><span class="brn-text">Sign Out</span> <i class="btn-icon fa fa-sign-out"></i></a>
+          </div>
+        </div>
+      </li>
+    </ul>
+    
+    <!-- Nav Search -->
+    <div class="wrap-search wrap-header-search ng-cloak" ng-cloak ng-show="isShowSearch();">
+      <div class="header-search">
+        <div uib-dropdown class="control-group left control-search-select dropdown">
+          <button uib-dropdown-toggle class="btn btn-dropdown-toggle btn-search-toggle"><i class="btn-icon fa fa-bars"></i></button>
+          <div uib-dropdown-menu class="dropdown-menu dropdown-menu-search-select dropdown-menu-panel dropdown-menu-left dropdown-menu-small-size">
+            <div class="heading">Search Options</div>
+            <div class="dropdown-menu-wrap-list">
+              <div class="dropdown-menu-list">
+              <div class="dropdown-menu-item" ng-click="$ctrl.closeAdvancedSearch()" ng-class="{active: !isOpenSearch}"><span class="dropdown-menu-item-text">Patient Search - Basic</span></div>
+                <div class="dropdown-menu-item" ng-repeat="item in searchOptionsList" ng-click="$ctrl.openAdvancedSearch($index)" ng-class="{active: isActiveTypeSearch(searchOptionsList[$index].type)}"><span class="dropdown-menu-item-text">{{item.name}}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button ng-show="!isOpenSearch" class="btn btn-search" ng-click="$ctrl.searchFunction();"><i class="btn-icon fa fa-search"></i></button>
+        <div ng-show="!isOpenSearch" class="wrap-search-holder">
+          <div class="search-holder">
+          <form ng-submit="$ctrl.searchFunction()">
+            <input key-bind="{ enter: '$ctrl.searchFunction()', esc: '$ctrl.cancelSearchMode()' }" class="form-control" placeholder="Search" type="text" uib-typeahead="report for report in $ctrl.reportTypes | filter:$viewValue" ng-model="search.searchExpression" ng-keyup="$ctrl.checkExpression(search.searchExpression)" ng-trim="false" ng-class="{'moveRight': $root.searchMode && !$root.reportTypeSet, 'moveFurtherRight': $root.searchMode && $root.reportTypeSet}" focus-element="searchFocused"/>
+          </form>
+            <i ng-show="search.searchExpression !== ''" ng-click="$ctrl.cancelSearchMode()" class="clearAll fa fa-times-circle"></i>
+          </div>
+        </div>
+      </div>
+      <div ng-if="isOpenSearch">
+        <search-advanced-component option="searchOption"></search-advanced-component>
+      </div>
+    </div>
+    <!-- / Nav Search -->
+
+    
+  </nav>
+
+  <!-- Header title -->
+  <div class="wrap-header-title" ng-if="isPageHeader">
+    <div class="container-fluid">
+      <div class="header-title">{{pageHeader}}</div>
+    </div>
+  </div>
+  <!-- /.Header title -->
+
+  <!-- Header toolbar -->
+  <div class="wrap-header-toolbar" ng-if=userContextViewExists>
+    <div class="container-fluid">
+      <div class="header-toolbar">
+        <button ng-click="$ctrl.clickSidebarBtn()" class="btn-toggle-sidebar wrap-icon" data-toggle="collapse" data-target="#sidebar-nav" aria-expanded="false">
+          <i class="btn-icon fa fa-bars"></i>
+          <span class="btn-text">Menu</span>
+        </button>
+        <div ui-view="banner"></div>
+      </div>
+    </div>
+  </div>
+  <!-- /.Header toolbar-->
+</header>

@@ -1,5 +1,5 @@
 /*
-  ~  Copyright 2016 Ripple Foundation C.I.C. Ltd
+  ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
   ~  
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -13,7 +13,19 @@
   ~  See the License for the specific language governing permissions and
   ~  limitations under the License.
 */
-export default function httpMiddleware($http, $timeout) {
+import * as actionTypes from '../constants/ActionTypes';
+
+export const httpSetTokenToCookie = function (response) {
+  const token = document.cookie.split('JSESSIONID=')[1];
+  const payloadToken = response.token;
+
+  if (payloadToken !== undefined && payloadToken !== token) {
+    // console.log('replace the token');
+    document.cookie = `JSESSIONID=${payloadToken}`
+  }
+};
+
+export default function httpMiddleware($http) {
 
   function callAPI(config) {
     config = angular.extend(config, {
@@ -66,23 +78,39 @@ export default function httpMiddleware($http, $timeout) {
     })); 
 
     return callAPI(config).then(
-      response => dispatch(Object.assign({}, {
-        type: successType,
-        payload: {
-          response,
-          meta
-        }
-      })),
-      error => dispatch(Object.assign({}, {
-        type: failureType,
-        error: true,
-        payload: {
-          error: error,
-          meta
-        }
-      }))
+      response => {
+        // Handle getting a new token
+        httpSetTokenToCookie(response);
+
+        dispatch(Object.assign({}, {
+          type: successType,
+          payload: {
+            response,
+            meta
+          }
+        }));
+      },
+      error => {
+				dispatch(Object.assign({}, {
+					type: failureType,
+					error: true,
+					payload: {
+						error: error,
+						meta
+					}
+				}));
+				// Handle all async Errors from Requests
+				dispatch(Object.assign({}, {
+					type: actionTypes.HANDLE_ERRORS,
+					error: true,
+					payload: {
+						error: error,
+						meta
+					}
+				}));
+      }
     );
   }
 }
 
-httpMiddleware.$inject = ['$http', '$timeout'];
+httpMiddleware.$inject = ['$http'];

@@ -5,6 +5,7 @@ const BowerWebpackPlugin = require('bower-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
+const packageJSON = require('./package.json');
 
 
 //=========================================================
@@ -37,7 +38,6 @@ const config = {
 
     root: path.resolve('./src'),
     alias: {
-      // 'morrisjs': '../../bower_components/morrisjs/morris.js',
       'spin': 'spin.js',
     }
   },
@@ -55,14 +55,16 @@ const config = {
 
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
+      'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
+      'process.env.VERSION_APP': JSON.stringify(packageJSON.version),
+      'process.env.VERSION_ANGULAR': JSON.stringify(packageJSON.dependencies.angular),
     }),
     new BowerWebpackPlugin({
       excludes: ['node_modules'],
       modulesDirectories: ['bower_components']
     }),
     new webpack.ResolverPlugin(
-        new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin(".bower.json", ["main"])
+      new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin(".bower.json", ["main"])
     ),
     new webpack.ProvidePlugin({
       angularSpinner: 'angular-spinner',
@@ -96,7 +98,6 @@ const config = {
 //  DEVELOPMENT or PRODUCTION
 //-------------------------------------
 if (ENV_DEVELOPMENT || ENV_PRODUCTION || ENV_PRODUCTION_EXTENSION) {
-
   config.entry = {
     index: [
       'bootstrap-loader',
@@ -116,24 +117,24 @@ if (ENV_DEVELOPMENT || ENV_PRODUCTION || ENV_PRODUCTION_EXTENSION) {
   };
 
   config.plugins.push(
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-        minChunks: Infinity
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'index.html',
-        hash: true,
-        inject: 'body',
-        favicon: './src/favicon.png',
-        template: './src/index.html'
-      }),
-      new HtmlWebpackPlugin({
-        filename: 'ui-kit.html',
-        hash: true,
-        inject: 'body',
-        favicon: './src/favicon.png',
-        template: './src/ui-kit.html'
-      })
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: Infinity
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      hash: true,
+      inject: 'body',
+      favicon: './src/favicon.png',
+      template: './src/index.html'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'ui-kit.html',
+      hash: true,
+      inject: 'body',
+      favicon: './src/favicon.png',
+      template: './src/ui-kit.html'
+    })
   );
 }
 
@@ -147,7 +148,7 @@ if (ENV_DEVELOPMENT) {
   config.entry.index.unshift(`webpack-dev-server/client?http://${HOST}:${PORT}`);
 
   config.module.loaders.push(
-      {test: /\.scss$/, loader: 'style!css!postcss!sass'}
+    {test: /\.scss$/, loader: 'style!css!postcss!sass'}
   );
 
   config.devServer = {
@@ -180,15 +181,22 @@ if (ENV_DEVELOPMENT) {
 //  PRODUCTION
 //-------------------------------------
 if (ENV_PRODUCTION || ENV_PRODUCTION_EXTENSION) {
-  config.devtool = 'source-map';
+  config.devtool = 'cheap-inline-module';
 
   config.module.loaders.push(
-      {test: /\.scss$/, loader: 'style!css!postcss!sass'}
+    {test: /\.scss$/, loader: 'style!css!postcss!sass'}
   );
-
   config.plugins.push(
-      new webpack.optimize.OccurenceOrderPlugin(),
-      new webpack.optimize.DedupePlugin()
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.UglifyJsPlugin({
+      comments: false,
+      exclude: [/bower_components/, /node_modules/],
+      parallel: 4,
+      compress: {
+        warnings: false
+      }
+    })
   );
 }
 
@@ -202,13 +210,13 @@ if (ENV_COPY) {
   };
 
   config.module.loaders.push(
-      {test: /\.scss$/, loader: 'style!css!postcss!sass'}
+    {test: /\.scss$/, loader: 'style!css!postcss!sass'}
   );
 
   config.plugins.push(
-      new CopyWebpackPlugin([
-        { from: './bower_components/moment', to: './build' }
-      ])
+    new CopyWebpackPlugin([
+      { from: './bower_components/moment', to: './build' }
+    ])
   );
 }
 
@@ -220,7 +228,7 @@ if (ENV_TEST) {
   config.devtool = 'inline-source-map';
 
   config.module.loaders.push(
-      {test: /\.scss$/, loader: 'style!css!postcss!sass'}
+    {test: /\.scss$/, loader: 'style!css!postcss!sass'}
   );
   config.module.preLoaders = [
     { test: /\.js$/, loader: 'isparta', include: path.join(__dirname, 'src/app') }

@@ -1,5 +1,5 @@
 /*
-  ~  Copyright 2016 Ripple Foundation C.I.C. Ltd
+  ~  Copyright 2017 Ripple Foundation C.I.C. Ltd
   ~  
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 */
 import angular from 'angular';
 
-import patientsActions from '../rippleui/pages/patients-list/patients-actions';
-import searchActions from '../rippleui/search/search-actions';
-import searchReport from '../rippleui/search/search-report-actions';
-import imageActions from '../rippleui/pages/dicom/image-actions';
+import patientsActions from '../pulsetileui/pages/patients-list/patients-actions';
+import searchActions from '../pulsetileui/search/search-actions';
+import searchReport from '../pulsetileui/search/search-report-actions';
+import pagesActions from '../redux/pages/pages-actions';
 import plugins from '../plugins';
 
 let app = angular
@@ -26,7 +26,7 @@ let app = angular
   .factory('patientsActions', patientsActions)
   .factory('searchActions', searchActions)
   .factory('searchReport', searchReport)
-  .factory('imageActions', imageActions)
+  .factory('pagesActions', pagesActions)
 
 plugins.forEach((plugin)=>{
   Object.keys(plugin.actions).forEach((name)=>{
